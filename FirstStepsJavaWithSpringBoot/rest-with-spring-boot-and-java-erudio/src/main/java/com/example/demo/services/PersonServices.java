@@ -6,31 +6,31 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.excepetions.ResourceNotFoundException;
 import com.example.demo.model.Person;
+import com.example.demo.repositories.PersonRepository;
 
 
 @Service
 public class PersonServices {
-	private final AtomicLong counter = new AtomicLong();
 	
 	private Logger logger = Logger.getLogger(PersonServices.class.getName());
 	
+	@Autowired
+	PersonRepository repository;
+	
 	public List<Person> findAll() {
 		logger.info("Finding all people!");
-		List<Person> persons = new ArrayList<>();
+	
 		
-		for (int i = 0; i < 8; i++) {
-			Person person = mockPerson(i);
-			persons.add(person);
-		}
-		
-		return persons;
+		return repository.findAll();
 		
 	}
 
-	public Person findById(String id) {
+	public Person findById(Long id) {
 		
 		logger.info("Finding one person!");
 		
@@ -42,7 +42,8 @@ public class PersonServices {
 		person.setGender("Male");
 		
 		
-		return person;
+		return repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 	}
 	
 	public Person create(Person person) {
