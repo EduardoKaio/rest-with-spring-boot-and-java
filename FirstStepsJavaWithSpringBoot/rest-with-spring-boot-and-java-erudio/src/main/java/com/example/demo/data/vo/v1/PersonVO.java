@@ -3,7 +3,6 @@ package com.example.demo.data.vo.v1;
 import java.io.Serializable;
 import java.util.Objects;
 
-
 public class PersonVO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -13,6 +12,7 @@ public class PersonVO implements Serializable {
 	private String firstName;
 	private String lastName;
 	private String adress;
+
 	private String gender;
 	
 	public PersonVO() {
