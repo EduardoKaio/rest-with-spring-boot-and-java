@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.mapper.custom.PersonMapper;
 import com.example.demo.repositories.UserRepository;
 
 
@@ -19,9 +18,6 @@ public class UserServices implements UserDetailsService{
 	
 	@Autowired
 	UserRepository repository;
-	
-	@Autowired
-	PersonMapper mapper;
 	
 	public UserServices(UserRepository repository) {
 		this.repository = repository;
@@ -36,8 +32,6 @@ public class UserServices implements UserDetailsService{
 		} else {
 			throw new UsernameNotFoundException("Username " + username + " not found!");
 		}
-		
 	}
-	
 	
 }

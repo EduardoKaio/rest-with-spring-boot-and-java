@@ -14,10 +14,10 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class JwtTokenFilter extends GenericFilterBean{
-	
+
 	@Autowired
 	private JwtTokenProvider tokenProvider;
-
+	
 	public JwtTokenFilter(JwtTokenProvider tokenProvider) {
 		this.tokenProvider = tokenProvider;
 	}
@@ -25,17 +25,13 @@ public class JwtTokenFilter extends GenericFilterBean{
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		String token = tokenProvider.resolveToken((HttpServletRequest)request);
-		
+		String token = tokenProvider.resolveToken((HttpServletRequest) request);
 		if (token != null && tokenProvider.validateToken(token)) {
 			Authentication auth = tokenProvider.getAuthentication(token);
-				if (auth != null) {
-					SecurityContextHolder.getContext().setAuthentication(auth);
-				}
+			if (auth != null) {
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			}
 		}
-		
-		chain.doFilter(request, response);	
-		
+		chain.doFilter(request, response);		
 	}
-
 }

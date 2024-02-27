@@ -1,4 +1,4 @@
-package com.example.demo.security.jwt;
+package com.example.demo.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +18,13 @@ import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.Secret
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.demo.security.jwt.JwtTokenFilter;
+import com.example.demo.security.jwt.JwtTokenProvider;
+
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-	
+
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 	
