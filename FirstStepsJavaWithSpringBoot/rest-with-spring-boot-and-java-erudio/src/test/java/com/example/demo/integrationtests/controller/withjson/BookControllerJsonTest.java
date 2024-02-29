@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -16,11 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.demo.configs.TestConfigs;
 import com.example.demo.integrationTests.vo.AccountCredentialsVO;
-import com.example.demo.integrationTests.vo.PersonVO;
+import com.example.demo.integrationTests.vo.BookVO;
 import com.example.demo.integrationTests.vo.TokenVO;
 import com.example.demo.integrationtests.testcontainers.AbstractIntegrationTest;
-import com.example.demo.model.Person;
-import com.example.demo.unittests.mapper.mocks.MockPerson;
+import com.example.demo.model.Book;
+import com.example.demo.unittests.mapper.mocks.MockBook;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -36,20 +37,20 @@ import io.restassured.specification.RequestSpecification;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
-public class PersonControllerJsonTest extends AbstractIntegrationTest{
+public class BookControllerJsonTest extends AbstractIntegrationTest{
 
 	private static RequestSpecification specification;
 	private static ObjectMapper objectMapper;
-	MockPerson input;
+	MockBook input;
 	
-	private static PersonVO person;
+	private static BookVO book;
 	
 	@BeforeAll
 	public static void setup() {
 		objectMapper = new ObjectMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
-		person = new PersonVO();
+		book = new BookVO();
 	}
 	
 	@Test
@@ -75,7 +76,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + accessToken)
-				.setBasePath("/api/person/v1")
+				.setBasePath("/api/book/v1")
 				.setPort(TestConfigs.SERVER_PORT)
 					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
 					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
@@ -86,11 +87,11 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(1)
 	public void testCreate() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		mockBook();
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_JSON)
-					.body(person)
+					.body(book)
 					.when()
 					.post()
 				.then()
@@ -99,34 +100,34 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 							.body()
 								.asString();
 		
-		PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
-		person = persistedPerson;
+		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
+		book = persistedBook;
 		
-		assertNotNull(persistedPerson);
-		assertNotNull(persistedPerson.getId());
-		assertNotNull(persistedPerson.getFirstName());
-		assertNotNull(persistedPerson.getLastName());
-		assertNotNull(persistedPerson.getAdress());
-		assertNotNull(persistedPerson.getGender());
+		assertNotNull(persistedBook);
+		assertNotNull(persistedBook.getId());
+		assertNotNull(persistedBook.getAuthor());
+		assertNotNull(persistedBook.getLaunchDate());
+		assertNotNull(persistedBook.getPrice());
+		assertNotNull(persistedBook.getTitle());
 		
-		assertTrue(persistedPerson.getId() > 0);
+		assertTrue(persistedBook.getId() > 0);
 		
-		assertEquals("Kaio", persistedPerson.getFirstName());
-		assertEquals("Eduardo", persistedPerson.getLastName());
-		assertEquals("Natal - RN", persistedPerson.getAdress());
-		assertEquals("Male", persistedPerson.getGender());
+		assertEquals("Robert C. Martin", persistedBook.getAuthor());
+//		assertEquals(new Date(), persistedBook.getLaunchDate());
+		assertEquals(77.00, persistedBook.getPrice());
+		assertEquals("Clean Code", persistedBook.getTitle());
 
 		
 	}
 	@Test
 	@Order(2)
 	public void testUpdate() throws JsonMappingException, JsonProcessingException {
-		person.setLastName("Eduardo Alves de Lima");
+		book.setTitle("Clean Code X");;
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_JSON)
 					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
-					.body(person)
+					.body(book)
 				.when()
 					.put()
 				.then()
@@ -135,21 +136,21 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 							.body()
 								.asString();
 		
-		PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
-		person = persistedPerson;
+		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
+		book = persistedBook;
 		
-		assertNotNull(persistedPerson);
-		assertNotNull(persistedPerson.getFirstName());
-		assertNotNull(persistedPerson.getLastName());
-		assertNotNull(persistedPerson.getAdress());
-		assertNotNull(persistedPerson.getGender());
+		assertNotNull(persistedBook);
+		assertNotNull(persistedBook.getAuthor());
+		assertNotNull(persistedBook.getLaunchDate());
+		assertNotNull(persistedBook.getPrice());
+		assertNotNull(persistedBook.getTitle());
 		
-		assertEquals(person.getId(), persistedPerson.getId());
+		assertEquals(book.getId(), persistedBook.getId());
 		
-		assertEquals("Kaio", persistedPerson.getFirstName());
-		assertEquals("Eduardo Alves de Lima", persistedPerson.getLastName());
-		assertEquals("Natal - RN", persistedPerson.getAdress());
-		assertEquals("Male", persistedPerson.getGender());
+		assertEquals("Robert C. Martin", persistedBook.getAuthor());
+//		assertEquals(new Date(), persistedBook.getLaunchDate());
+		assertEquals(77.00, persistedBook.getPrice());
+		assertEquals("Clean Code X", persistedBook.getTitle());
 
 		
 	}
@@ -158,12 +159,12 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	@Test
 	@Order(3)
 	public void testFindById() throws JsonMappingException, JsonProcessingException {
-		mockPerson();
+		mockBook();
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_JSON)
 					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
-					.pathParam("id", person.getId())
+					.pathParam("id", book.getId())
 				.when()
 					.get("{id}")
 				.then()
@@ -172,22 +173,22 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 							.body()
 								.asString();
 		
-		PersonVO persistedPerson = objectMapper.readValue(content, PersonVO.class);
-		person = persistedPerson;
+		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
+		book = persistedBook;
 		
-		assertNotNull(persistedPerson);
-		assertNotNull(persistedPerson.getId());
-		assertNotNull(persistedPerson.getFirstName());
-		assertNotNull(persistedPerson.getLastName());
-		assertNotNull(persistedPerson.getAdress());
-		assertNotNull(persistedPerson.getGender());
+		assertNotNull(persistedBook);
+		assertNotNull(persistedBook.getId());
+		assertNotNull(persistedBook.getAuthor());
+		assertNotNull(persistedBook.getLaunchDate());
+		assertNotNull(persistedBook.getPrice());
+		assertNotNull(persistedBook.getTitle());
 		
-		assertEquals(person.getId(), persistedPerson.getId());
+		assertEquals(book.getId(), persistedBook.getId());
 		
-		assertEquals("Kaio", persistedPerson.getFirstName());
-		assertEquals("Eduardo Alves de Lima", persistedPerson.getLastName());
-		assertEquals("Natal - RN", persistedPerson.getAdress());
-		assertEquals("Male", persistedPerson.getGender());
+		assertEquals("Robert C. Martin", persistedBook.getAuthor());
+//		assertEquals(new Date(), persistedBook.getLaunchDate());
+		assertEquals(77.00, persistedBook.getPrice());
+		assertEquals("Clean Code X", persistedBook.getTitle());
 
 		
 	}
@@ -200,7 +201,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		
 		given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_JSON)
-				.pathParam("id", person.getId())
+				.pathParam("id", book.getId())
 				.when()
 				.delete("{id}")
 				.then()
@@ -222,37 +223,37 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.body()
 				.asString();
 		
-		List<PersonVO> people = objectMapper.readValue(content, new TypeReference<List<PersonVO>>() {});
+		List<BookVO> people = objectMapper.readValue(content, new TypeReference<List<BookVO>>() {});
 		
-		PersonVO foundPersonOne = people.get(0);
+		BookVO foundBookOne = people.get(0);
 		
-		assertNotNull(foundPersonOne.getId());
-		assertNotNull(foundPersonOne.getFirstName());
-		assertNotNull(foundPersonOne.getLastName());
-		assertNotNull(foundPersonOne.getAdress());
-		assertNotNull(foundPersonOne.getGender());
+		assertNotNull(foundBookOne.getId());
+		assertNotNull(foundBookOne.getAuthor());
+		assertNotNull(foundBookOne.getLaunchDate());
+		assertNotNull(foundBookOne.getPrice());
+		assertNotNull(foundBookOne.getTitle());
 		
-		assertEquals(1, foundPersonOne.getId());
+		assertEquals(1, foundBookOne.getId());
 		
-		assertEquals("Kaio", foundPersonOne.getFirstName());
-		assertEquals("Lima", foundPersonOne.getLastName());
-		assertEquals("Natal", foundPersonOne.getAdress());
-		assertEquals("Male", foundPersonOne.getGender());
+		assertEquals("Michael C. Feathers", foundBookOne.getAuthor());
+//		assertEquals("", foundBookOne.getLaunchDate());
+		assertEquals(49.00, foundBookOne.getPrice());
+		assertEquals("Working effectively with legacy code", foundBookOne.getTitle());
 		
-		PersonVO foundPersonFive = people.get(4);
+		BookVO foundBookFive = people.get(4);
 		
-		assertNotNull(foundPersonFive.getId());
-		assertNotNull(foundPersonFive.getFirstName());
-		assertNotNull(foundPersonFive.getLastName());
-		assertNotNull(foundPersonFive.getAdress());
-		assertNotNull(foundPersonFive.getGender());
+		assertNotNull(foundBookFive.getId());
+		assertNotNull(foundBookFive.getAuthor());
+		assertNotNull(foundBookFive.getLaunchDate());
+		assertNotNull(foundBookFive.getPrice());
+		assertNotNull(foundBookFive.getTitle());
 		
-		assertEquals(10, foundPersonFive.getId());
+		assertEquals(5, foundBookFive.getId());
 		
-		assertEquals("indira", foundPersonFive.getFirstName());
-		assertEquals("sales", foundPersonFive.getLastName());
-		assertEquals("sp", foundPersonFive.getAdress());
-		assertEquals("male", foundPersonFive.getGender());
+		assertEquals("Steve McConnell", foundBookFive.getAuthor());
+//		assertEquals("sales", foundBookFive.getLaunchDate());
+		assertEquals(58.00, foundBookFive.getPrice());
+		assertEquals("Code complete", foundBookFive.getTitle());
 		
 	}
 	
@@ -261,7 +262,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	public void testFindAllWitoutToken() throws JsonMappingException, JsonProcessingException {		
 		
 		RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
-				.setBasePath("/api/person/v1")
+				.setBasePath("/api/book/v1")
 				.setPort(TestConfigs.SERVER_PORT)
 					.addFilter(new RequestLoggingFilter(LogDetail.ALL))
 					.addFilter(new ResponseLoggingFilter(LogDetail.ALL))
@@ -276,11 +277,11 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		
 	}
 	
-	private void mockPerson() {
-		person.setFirstName("Kaio");
-		person.setLastName("Eduardo");
-		person.setAdress("Natal - RN");
-		person.setGender("Male");
+	private void mockBook() {
+		book.setAuthor("Robert C. Martin");
+		book.setLaunchDate(new Date());;
+		book.setPrice(77.00);
+		book.setTitle("Clean Code");
 		
 	}
 

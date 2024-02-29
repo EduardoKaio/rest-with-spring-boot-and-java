@@ -1,8 +1,10 @@
-package com.example.demo.data.vo.v1.security;
+package com.example.demo.integrationTests.vo;
 
 import java.io.Serializable;
-import java.util.Objects;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class AccountCredentialsVO implements Serializable{
 
 

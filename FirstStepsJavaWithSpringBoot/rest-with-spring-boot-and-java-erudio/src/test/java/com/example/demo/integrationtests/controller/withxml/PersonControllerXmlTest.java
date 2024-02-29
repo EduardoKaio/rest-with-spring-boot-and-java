@@ -1,7 +1,7 @@
-package com.example.demo.integrationtests.controller.withjson;
+package com.example.demo.integrationtests.controller.withxml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,34 +19,33 @@ import com.example.demo.integrationTests.vo.AccountCredentialsVO;
 import com.example.demo.integrationTests.vo.PersonVO;
 import com.example.demo.integrationTests.vo.TokenVO;
 import com.example.demo.integrationtests.testcontainers.AbstractIntegrationTest;
-import com.example.demo.model.Person;
-import com.example.demo.unittests.mapper.mocks.MockPerson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
 
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
-public class PersonControllerJsonTest extends AbstractIntegrationTest{
+public class PersonControllerXmlTest extends AbstractIntegrationTest{
 
 	private static RequestSpecification specification;
-	private static ObjectMapper objectMapper;
-	MockPerson input;
+	private static XmlMapper objectMapper;
 	
+
 	private static PersonVO person;
 	
 	@BeforeAll
 	public static void setup() {
-		objectMapper = new ObjectMapper();
+		objectMapper = new XmlMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
 		person = new PersonVO();
@@ -57,13 +56,12 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	public void authorization() throws JsonMappingException, JsonProcessingException {
 		
 		AccountCredentialsVO user = new AccountCredentialsVO("leandro", "admin123");
-		
-		
-		
+				
 		var accessToken = given()
 				.basePath("/auth/signin")
 					.port(TestConfigs.SERVER_PORT)
-					.contentType(TestConfigs.CONTENT_TYPE_JSON)
+					.contentType(TestConfigs.CONTENT_TYPE_XML)
+					.accept(TestConfigs.CONTENT_TYPE_XML)
 				.body(user)
 					.when()
 				.post()
@@ -71,7 +69,8 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 						.statusCode(200)
 							.extract()
 							.body()
-								.as(TokenVO.class).getAccessToken();
+								.as(TokenVO.class)
+								.getAccessToken();
 		
 		specification = new RequestSpecBuilder()
 				.addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, "Bearer " + accessToken)
@@ -89,7 +88,9 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		mockPerson();
 		
 		var content = given().spec(specification)
-				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
+					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
 					.body(person)
 					.when()
 					.post()
@@ -124,7 +125,8 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		person.setLastName("Eduardo Alves de Lima");
 		
 		var content = given().spec(specification)
-				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
 					.body(person)
 				.when()
@@ -154,14 +156,14 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		
 	}
 	
-	
 	@Test
 	@Order(3)
 	public void testFindById() throws JsonMappingException, JsonProcessingException {
 		mockPerson();
 		
 		var content = given().spec(specification)
-				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
 					.pathParam("id", person.getId())
 				.when()
@@ -182,24 +184,21 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPerson.getAdress());
 		assertNotNull(persistedPerson.getGender());
 		
-		assertEquals(person.getId(), persistedPerson.getId());
+		assertTrue(persistedPerson.getId() > 0);
 		
 		assertEquals("Kaio", persistedPerson.getFirstName());
 		assertEquals("Eduardo Alves de Lima", persistedPerson.getLastName());
 		assertEquals("Natal - RN", persistedPerson.getAdress());
 		assertEquals("Male", persistedPerson.getGender());
-
 		
 	}
-	
-
-	
 	@Test
 	@Order(4)
 	public void testDelete() throws JsonMappingException, JsonProcessingException {
 		
 		given().spec(specification)
-				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 				.pathParam("id", person.getId())
 				.when()
 				.delete("{id}")
@@ -213,7 +212,8 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	public void testFindAll() throws JsonMappingException, JsonProcessingException {		
 		
 		var content = given().spec(specification)
-				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 				.when()
 				.get()
 				.then()
@@ -268,7 +268,8 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.build();
 		
 			given().spec(specificationWithoutToken)
-				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 				.when()
 				.get()
 				.then()
@@ -276,6 +277,7 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 		
 	}
 	
+
 	private void mockPerson() {
 		person.setFirstName("Kaio");
 		person.setLastName("Eduardo");
