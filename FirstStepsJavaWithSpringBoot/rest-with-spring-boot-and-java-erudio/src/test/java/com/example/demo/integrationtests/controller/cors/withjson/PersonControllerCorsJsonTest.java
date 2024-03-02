@@ -102,6 +102,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPerson.getLastName());
 		assertNotNull(persistedPerson.getAdress());
 		assertNotNull(persistedPerson.getGender());
+		assertTrue(persistedPerson.getEnabled());
 		
 		assertTrue(persistedPerson.getId() > 0);
 		
@@ -162,6 +163,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		assertNotNull(persistedPerson.getLastName());
 		assertNotNull(persistedPerson.getAdress());
 		assertNotNull(persistedPerson.getGender());
+		assertTrue(persistedPerson.getEnabled());
 		
 		assertTrue(persistedPerson.getId() > 0);
 		
@@ -200,6 +202,7 @@ public class PersonControllerCorsJsonTest extends AbstractIntegrationTest{
 		person.setLastName("Rasmussem");
 		person.setAdress("New York EUA");
 		person.setGender("Male");
+		person.setEnabled(true);
 		
 	}
 

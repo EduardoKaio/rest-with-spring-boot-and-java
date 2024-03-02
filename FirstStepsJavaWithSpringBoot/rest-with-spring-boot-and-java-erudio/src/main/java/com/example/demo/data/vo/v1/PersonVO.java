@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
-@JsonPropertyOrder({"id", "firstName", "lastName", "adress", "gender"})
+@JsonPropertyOrder({"id", "firstName", "lastName", "adress", "gender", "enable"})
 public class PersonVO extends RepresentationModel<PersonVO> implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -20,9 +20,17 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
 	private String firstName;
 	private String lastName;
 	private String adress;
-
 	private String gender;
+	private Boolean enabled;
 	
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public PersonVO() {
 	}
 
@@ -70,7 +78,7 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + Objects.hash(adress, firstName, gender, key, lastName);
+		result = prime * result + Objects.hash(adress, enabled, firstName, gender, key, lastName);
 		return result;
 	}
 
@@ -83,9 +91,12 @@ public class PersonVO extends RepresentationModel<PersonVO> implements Serializa
 		if (getClass() != obj.getClass())
 			return false;
 		PersonVO other = (PersonVO) obj;
-		return Objects.equals(adress, other.adress) && Objects.equals(firstName, other.firstName)
-				&& Objects.equals(gender, other.gender) && key == other.key && Objects.equals(lastName, other.lastName);
+		return Objects.equals(adress, other.adress) && Objects.equals(enabled, other.enabled)
+				&& Objects.equals(firstName, other.firstName) && Objects.equals(gender, other.gender)
+				&& key == other.key && Objects.equals(lastName, other.lastName);
 	}
+
+
 
 
 	
