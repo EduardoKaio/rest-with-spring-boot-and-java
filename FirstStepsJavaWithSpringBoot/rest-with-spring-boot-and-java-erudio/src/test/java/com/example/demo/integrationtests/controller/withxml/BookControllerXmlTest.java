@@ -1,8 +1,8 @@
 package com.example.demo.integrationtests.controller.withxml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
@@ -19,17 +19,14 @@ import com.example.demo.configs.TestConfigs;
 import com.example.demo.integrationTests.vo.AccountCredentialsVO;
 import com.example.demo.integrationTests.vo.BookVO;
 import com.example.demo.integrationTests.vo.TokenVO;
+import com.example.demo.integrationTests.vo.pagedmodels.PagedModelBook;
 import com.example.demo.integrationtests.testcontainers.AbstractIntegrationTest;
-import com.example.demo.model.Book;
-import com.example.demo.unittests.mapper.mocks.MockBook;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -40,14 +37,13 @@ import io.restassured.specification.RequestSpecification;
 public class BookControllerXmlTest extends AbstractIntegrationTest{
 
 	private static RequestSpecification specification;
-	private static ObjectMapper objectMapper;
-	MockBook input;
+	private static  XmlMapper objectMapper;
 	
 	private static BookVO book;
 	
 	@BeforeAll
 	public static void setup() {
-		objectMapper = new ObjectMapper();
+		objectMapper = new XmlMapper();
 		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 		
 		book = new BookVO();
@@ -91,6 +87,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 					.body(book)
 					.when()
 					.post()
@@ -100,22 +97,21 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 							.body()
 								.asString();
 		
-		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
-		book = persistedBook;
+		book = objectMapper.readValue(content, BookVO.class);
 		
-		assertNotNull(persistedBook);
-		assertNotNull(persistedBook.getId());
-		assertNotNull(persistedBook.getAuthor());
-		assertNotNull(persistedBook.getLaunchDate());
-		assertNotNull(persistedBook.getPrice());
-		assertNotNull(persistedBook.getTitle());
+		assertNotNull(book);
+		assertNotNull(book.getId());
+		assertNotNull(book.getAuthor());
+		assertNotNull(book.getLaunchDate());
+		assertNotNull(book.getPrice());
+		assertNotNull(book.getTitle());
 		
-		assertTrue(persistedBook.getId() > 0);
+		assertTrue(book.getId() > 0);
 		
-		assertEquals("Robert C. Martin", persistedBook.getAuthor());
-//		assertEquals(new Date(), persistedBook.getLaunchDate());
-		assertEquals(77.00, persistedBook.getPrice());
-		assertEquals("Clean Code", persistedBook.getTitle());
+		assertEquals("Robert C. Martin", book.getAuthor());
+//		assertEquals(new Date(), book.getLaunchDate());
+		assertEquals(77.00, book.getPrice());
+		assertEquals("Clean Code", book.getTitle());
 
 		
 	}
@@ -126,31 +122,30 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_XML)
-					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 					.body(book)
-				.when()
+					.when()
 					.put()
 				.then()
 					.statusCode(200)
 						.extract()
-							.body()
-								.asString();
+						.body()
+							.asString();
 		
-		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
-		book = persistedBook;
+		 BookVO bookUpdated = objectMapper.readValue(content, BookVO.class);
 		
-		assertNotNull(persistedBook);
-		assertNotNull(persistedBook.getAuthor());
-		assertNotNull(persistedBook.getLaunchDate());
-		assertNotNull(persistedBook.getPrice());
-		assertNotNull(persistedBook.getTitle());
+		assertNotNull(bookUpdated);
+		assertNotNull(bookUpdated.getAuthor());
+		assertNotNull(bookUpdated.getLaunchDate());
+		assertNotNull(bookUpdated.getPrice());
+		assertNotNull(bookUpdated.getTitle());
 		
-		assertEquals(book.getId(), persistedBook.getId());
+		assertEquals(book.getId(), bookUpdated.getId());
 		
-		assertEquals("Robert C. Martin", persistedBook.getAuthor());
-//		assertEquals(new Date(), persistedBook.getLaunchDate());
-		assertEquals(77.00, persistedBook.getPrice());
-		assertEquals("Clean Code X", persistedBook.getTitle());
+		assertEquals("Robert C. Martin", bookUpdated.getAuthor());
+//		assertEquals(new Date(), bookUpdated.getLaunchDate());
+		assertEquals(77.00, bookUpdated.getPrice());
+		assertEquals("Clean Code X", bookUpdated.getTitle());
 
 		
 	}
@@ -163,32 +158,31 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_XML)
-					.header(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_KAIO)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 					.pathParam("id", book.getId())
-				.when()
+					.when()
 					.get("{id}")
 				.then()
 					.statusCode(200)
 						.extract()
-							.body()
-								.asString();
+						.body()
+							.asString();
 		
-		BookVO persistedBook = objectMapper.readValue(content, BookVO.class);
-		book = persistedBook;
+		BookVO foundBook = objectMapper.readValue(content, BookVO.class);
 		
-		assertNotNull(persistedBook);
-		assertNotNull(persistedBook.getId());
-		assertNotNull(persistedBook.getAuthor());
-		assertNotNull(persistedBook.getLaunchDate());
-		assertNotNull(persistedBook.getPrice());
-		assertNotNull(persistedBook.getTitle());
+		assertNotNull(foundBook);
+		assertNotNull(foundBook.getId());
+		assertNotNull(foundBook.getAuthor());
+		assertNotNull(foundBook.getLaunchDate());
+		assertNotNull(foundBook.getPrice());
+		assertNotNull(foundBook.getTitle());
 		
-		assertEquals(book.getId(), persistedBook.getId());
+		assertEquals(book.getId(), foundBook.getId());
 		
-		assertEquals("Robert C. Martin", persistedBook.getAuthor());
-//		assertEquals(new Date(), persistedBook.getLaunchDate());
-		assertEquals(77.00, persistedBook.getPrice());
-		assertEquals("Clean Code X", persistedBook.getTitle());
+		assertEquals("Robert C. Martin", foundBook.getAuthor());
+//		assertEquals(new Date(), foundBook.getLaunchDate());
+		assertEquals(77.00, foundBook.getPrice());
+		assertEquals("Clean Code X", foundBook.getTitle());
 
 		
 	}
@@ -200,12 +194,13 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 	public void testDelete() throws JsonMappingException, JsonProcessingException {
 		
 		given().spec(specification)
-				.contentType(TestConfigs.CONTENT_TYPE_XML)
-				.pathParam("id", book.getId())
-				.when()
-				.delete("{id}")
-				.then()
-				.statusCode(204);
+		.contentType(TestConfigs.CONTENT_TYPE_XML)
+		.accept(TestConfigs.CONTENT_TYPE_XML)
+			.pathParam("id", book.getId())
+			.when()
+			.delete("{id}")
+		.then()
+			.statusCode(204);
 		
 	}
 
@@ -215,17 +210,20 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		
 		var content = given().spec(specification)
 				.contentType(TestConfigs.CONTENT_TYPE_XML)
-				.when()
-				.get()
+				.accept(TestConfigs.CONTENT_TYPE_XML)
+				.queryParams("page", 1, "size", 5, "direction", "asc")
+					.when()
+					.get()
 				.then()
-				.statusCode(200)
-				.extract()
-				.body()
-				.asString();
+					.statusCode(200)
+						.extract()
+						.body()
+							.asString();
 		
-		List<BookVO> people = objectMapper.readValue(content, new TypeReference<List<BookVO>>() {});
+		PagedModelBook wrapper = objectMapper.readValue(content, PagedModelBook.class);
+		List<BookVO> books = wrapper.getContent();
 		
-		BookVO foundBookOne = people.get(0);
+		BookVO foundBookOne = books.get(0);
 		
 		assertNotNull(foundBookOne.getId());
 		assertNotNull(foundBookOne.getAuthor());
@@ -233,14 +231,13 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		assertNotNull(foundBookOne.getPrice());
 		assertNotNull(foundBookOne.getTitle());
 		
-		assertEquals(1, foundBookOne.getId());
+		assertEquals(11, foundBookOne.getId());
 		
-		assertEquals("Michael C. Feathers", foundBookOne.getAuthor());
-//		assertEquals("", foundBookOne.getLaunchDate());
-		assertEquals(49.00, foundBookOne.getPrice());
-		assertEquals("Working effectively with legacy code", foundBookOne.getTitle());
+		assertEquals("Roger S. Pressman", foundBookOne.getAuthor());
+		assertEquals(56.0, foundBookOne.getPrice());
+		assertEquals("Engenharia de Software: uma abordagem profissional", foundBookOne.getTitle());
 		
-		BookVO foundBookFive = people.get(4);
+		BookVO foundBookFive = books.get(4);
 		
 		assertNotNull(foundBookFive.getId());
 		assertNotNull(foundBookFive.getAuthor());
@@ -248,12 +245,11 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		assertNotNull(foundBookFive.getPrice());
 		assertNotNull(foundBookFive.getTitle());
 		
-		assertEquals(5, foundBookFive.getId());
+		assertEquals(4, foundBookFive.getId());
 		
-		assertEquals("Steve McConnell", foundBookFive.getAuthor());
-//		assertEquals("sales", foundBookFive.getLaunchDate());
-		assertEquals(58.00, foundBookFive.getPrice());
-		assertEquals("Code complete", foundBookFive.getTitle());
+		assertEquals("Crockford", foundBookFive.getAuthor());
+		assertEquals(67.0, foundBookFive.getPrice());
+		assertEquals("JavaScript", foundBookFive.getTitle());
 		
 	}
 	
@@ -270,6 +266,7 @@ public class BookControllerXmlTest extends AbstractIntegrationTest{
 		
 			given().spec(specificationWithoutToken)
 				.contentType(TestConfigs.CONTENT_TYPE_XML)
+				.accept(TestConfigs.CONTENT_TYPE_XML)
 				.when()
 				.get()
 				.then()

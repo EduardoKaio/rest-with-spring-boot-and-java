@@ -300,6 +300,44 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 	
 	@Test
 	@Order(7)
+	public void testFindByName() throws JsonMappingException, JsonProcessingException {		
+		
+		var content = given().spec(specification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.pathParam("firstName", "otis")
+				.queryParams("page", 0, "size", 6, "direction", "asc")
+				.when()
+				.get("findPersonByName/{firstName}")
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+		
+		WrapperPersonVO wrapper= objectMapper.readValue(content, WrapperPersonVO.class);
+		var people = wrapper.getEmbedded().getPersons();
+		
+		PersonVO foundPersonOne = people.get(0);
+		
+		assertNotNull(foundPersonOne.getId());
+		assertNotNull(foundPersonOne.getFirstName());
+		assertNotNull(foundPersonOne.getLastName());
+		assertNotNull(foundPersonOne.getAdress());
+		assertNotNull(foundPersonOne.getGender());
+		assertFalse(foundPersonOne.getEnabled());
+		
+		
+		assertEquals(682, foundPersonOne.getId());
+		
+		assertEquals("Otis", foundPersonOne.getFirstName());
+		assertEquals("Bassam", foundPersonOne.getLastName());
+		assertEquals("56025 Dayton Parkway", foundPersonOne.getAdress());
+		assertEquals("Male", foundPersonOne.getGender());
+		
+	}
+	
+	@Test
+	@Order(8)
 	public void testFindAllWitoutToken() throws JsonMappingException, JsonProcessingException {		
 		
 		RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
@@ -315,6 +353,34 @@ public class PersonControllerJsonTest extends AbstractIntegrationTest{
 				.get()
 				.then()
 				.statusCode(403);
+		
+	}
+	@Test
+	@Order(9)
+	public void testHATEOAS() throws JsonMappingException, JsonProcessingException {		
+		
+		var content = given().spec(specification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.queryParams("page", 2, "size", 6, "direction", "asc")
+				.when()
+				.get()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+		
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/432\"}}}"));
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/58\"}}}"));
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/671\"}}}"));
+				
+		assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=167&size=6&sort=firstName,asc\"}}"));
+		assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=3&size=6&sort=firstName,asc\"}"));
+		assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8081/api/person/v1?page=2&size=6&direction=asc\"}"));
+		assertTrue(content.contains("\"prev\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=1&size=6&sort=firstName,asc\"}"));
+		assertTrue(content.contains("{\"first\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=0&size=6&sort=firstName,asc\"}"));
+		
+		assertTrue(content.contains("\"page\":{\"size\":6,\"totalElements\":1008,\"totalPages\":168,\"number\":2}}"));
 		
 	}
 	

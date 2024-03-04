@@ -1,11 +1,10 @@
 package com.example.demo.integrationtests.controller.withyaml;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -19,20 +18,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.example.demo.configs.TestConfigs;
 import com.example.demo.integrationTests.vo.AccountCredentialsVO;
 import com.example.demo.integrationTests.vo.BookVO;
-import com.example.demo.integrationTests.vo.PersonVO;
 import com.example.demo.integrationTests.vo.TokenVO;
+import com.example.demo.integrationTests.vo.pagedmodels.PagedModelBook;
 import com.example.demo.integrationtests.controller.withyaml.mapper.YAMLMapper;
 import com.example.demo.integrationtests.testcontainers.AbstractIntegrationTest;
-import com.example.demo.model.Book;
-import com.example.demo.unittests.mapper.mocks.MockBook;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.common.mapper.TypeRef;
 import io.restassured.config.EncoderConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.LogDetail;
@@ -224,19 +217,21 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 	@Order(5)
 	public void testFindAll() throws JsonMappingException, JsonProcessingException {		
 		
-		var content = given().spec(specification).config(RestAssuredConfig.config()
+		var wrapper = given().spec(specification).config(RestAssuredConfig.config()
 				.encoderConfig(EncoderConfig.encoderConfig()
 						.encodeContentTypeAs(TestConfigs.CONTENT_TYPE_YML, ContentType.TEXT)))
 				.contentType(TestConfigs.CONTENT_TYPE_YML)
+				.accept(TestConfigs.CONTENT_TYPE_YML)
+				.queryParams("page", 1, "size", 5, "direction", "asc")
 				.when()
 				.get()
 				.then()
 				.statusCode(200)
 				.extract()
 				.body()
-				.as(BookVO[].class, objectMapper);
+				.as(PagedModelBook.class, objectMapper);
 		
-		List<BookVO> books = Arrays.asList(content);
+		List<BookVO> books = wrapper.getContent();
 		
 		BookVO foundBookOne = books.get(0);
 		
@@ -246,12 +241,11 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 		assertNotNull(foundBookOne.getPrice());
 		assertNotNull(foundBookOne.getTitle());
 		
-		assertEquals(1, foundBookOne.getId());
+		assertEquals(11, foundBookOne.getId());
 		
-		assertEquals("Michael C. Feathers", foundBookOne.getAuthor());
-//		assertEquals("", foundBookOne.getLaunchDate());
-		assertEquals(49.00, foundBookOne.getPrice());
-		assertEquals("Working effectively with legacy code", foundBookOne.getTitle());
+		assertEquals("Roger S. Pressman", foundBookOne.getAuthor());
+		assertEquals(56.0, foundBookOne.getPrice());
+		assertEquals("Engenharia de Software: uma abordagem profissional", foundBookOne.getTitle());
 		
 		BookVO foundBookFive = books.get(4);
 		
@@ -261,12 +255,11 @@ public class BookControllerYamlTest extends AbstractIntegrationTest{
 		assertNotNull(foundBookFive.getPrice());
 		assertNotNull(foundBookFive.getTitle());
 		
-		assertEquals(5, foundBookFive.getId());
+		assertEquals(4, foundBookFive.getId());
 		
-		assertEquals("Steve McConnell", foundBookFive.getAuthor());
-//		assertEquals("sales", foundBookFive.getLaunchDate());
-		assertEquals(58.00, foundBookFive.getPrice());
-		assertEquals("Code complete", foundBookFive.getTitle());
+		assertEquals("Crockford", foundBookFive.getAuthor());
+		assertEquals(67.0, foundBookFive.getPrice());
+		assertEquals("JavaScript", foundBookFive.getTitle());
 		
 	}
 	
