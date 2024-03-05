@@ -1,5 +1,9 @@
+server:
+  port: 80
 cors:
   originPatterns: http://localhost:3000,http://localhost:8080,https://kaioeduardo.com
+file:
+  upload-dir: /home/kaio/Downloads/curso de spring/UploadDir
 security:
   jwt:
     token:
@@ -16,6 +20,12 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 200MB
+      max-request-size: 215MB
 springdoc:
   pathsToMatch:
     - /auth/**

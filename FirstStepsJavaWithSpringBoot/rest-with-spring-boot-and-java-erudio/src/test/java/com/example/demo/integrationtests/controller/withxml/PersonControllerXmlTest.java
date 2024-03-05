@@ -373,19 +373,29 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest{
 				.extract()
 				.body()
 				.asString();
+		assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8081/api/person/v1/432</href></links>"));
+		assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8081/api/person/v1/58</href></links>"));
+		assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8081/api/person/v1/671</href></links>"));
 		
-		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/432\"}}}"));
-		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/58\"}}}"));
-		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/671\"}}}"));
-				
-		assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=167&size=6&sort=firstName,asc\"}}"));
-		assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=3&size=6&sort=firstName,asc\"}"));
-		assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8081/api/person/v1?page=2&size=6&direction=asc\"}"));
-		assertTrue(content.contains("\"prev\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=1&size=6&sort=firstName,asc\"}"));
-		assertTrue(content.contains("{\"first\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=0&size=6&sort=firstName,asc\"}"));
+		assertTrue(content.contains("<links><rel>first</rel><href>http://localhost:8081/api/person/v1?direction=asc&amp;page=0&amp;size=6&amp;sort=firstName,asc</href></links>"));
+		assertTrue(content.contains("<links><rel>prev</rel><href>http://localhost:8081/api/person/v1?direction=asc&amp;page=1&amp;size=6&amp;sort=firstName,asc</href></links>"));
+		assertTrue(content.contains("<links><rel>self</rel><href>http://localhost:8081/api/person/v1?page=2&amp;size=6&amp;direction=asc</href></links>"));
+		assertTrue(content.contains("<links><rel>next</rel><href>http://localhost:8081/api/person/v1?direction=asc&amp;page=3&amp;size=6&amp;sort=firstName,asc</href></links>"));
+		assertTrue(content.contains("<links><rel>last</rel><href>http://localhost:8081/api/person/v1?direction=asc&amp;page=167&amp;size=6&amp;sort=firstName,asc</href></links>"));
+		assertTrue(content.contains("<page><size>6</size><totalElements>1008</totalElements><totalPages>168</totalPages><number>2</number></page>"));
 		
-		assertTrue(content.contains("\"page\":{\"size\":6,\"totalElements\":1008,\"totalPages\":168,\"number\":2}}"));
-		
+//		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/432\"}}}"));
+//		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/58\"}}}"));
+//		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/person/v1/671\"}}}"));
+//				
+//		assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=167&size=6&sort=firstName,asc\"}}"));
+//		assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=3&size=6&sort=firstName,asc\"}"));
+//		assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8081/api/person/v1?page=2&size=6&direction=asc\"}"));
+//		assertTrue(content.contains("\"prev\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=1&size=6&sort=firstName,asc\"}"));
+//		assertTrue(content.contains("{\"first\":{\"href\":\"http://localhost:8081/api/person/v1?direction=asc&page=0&size=6&sort=firstName,asc\"}"));
+//		
+//		assertTrue(content.contains("\"page\":{\"size\":6,\"totalElements\":1008,\"totalPages\":168,\"number\":2}}"));
+//		
 		
 		
 	}
