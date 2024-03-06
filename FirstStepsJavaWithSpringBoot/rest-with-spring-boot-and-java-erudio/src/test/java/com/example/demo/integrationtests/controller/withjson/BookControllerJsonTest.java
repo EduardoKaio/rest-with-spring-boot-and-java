@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import com.example.demo.integrationTests.vo.BookVO;
 import com.example.demo.integrationTests.vo.TokenVO;
 import com.example.demo.integrationTests.vo.wrappers.WrapperBookVO;
 import com.example.demo.integrationtests.testcontainers.AbstractIntegrationTest;
+import com.example.demo.model.Book;
 import com.example.demo.unittests.mapper.mocks.MockBook;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -274,6 +276,35 @@ public class BookControllerJsonTest extends AbstractIntegrationTest{
 				.statusCode(403);
 		
 	}
+	@Test
+	@Order(7)
+	public void testHATEOAS() throws JsonMappingException, JsonProcessingException {		
+		
+		var content = given().spec(specification)
+				.contentType(TestConfigs.CONTENT_TYPE_JSON)
+				.queryParams("page", 1, "size", 5, "direction", "asc")
+				.when()
+				.get()
+				.then()
+				.statusCode(200)
+				.extract()
+				.body()
+				.asString();
+		
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/book/v1/11\"}}}"));
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/book/v1/7\"}}}"));
+		assertTrue(content.contains("\"_links\":{\"self\":{\"href\":\"http://localhost:8081/api/book/v1/15\"}}}"));
+				
+		assertTrue(content.contains("\"last\":{\"href\":\"http://localhost:8081/api/book/v1?direction=asc&page=2&size=5&sort=title,asc\"}}"));
+		assertTrue(content.contains("\"next\":{\"href\":\"http://localhost:8081/api/book/v1?direction=asc&page=2&size=5&sort=title,asc\"}"));
+		assertTrue(content.contains("\"self\":{\"href\":\"http://localhost:8081/api/book/v1?page=1&size=5&direction=asc\"}"));
+		assertTrue(content.contains("\"prev\":{\"href\":\"http://localhost:8081/api/book/v1?direction=asc&page=0&size=5&sort=title,asc\"}"));
+		assertTrue(content.contains("{\"first\":{\"href\":\"http://localhost:8081/api/book/v1?direction=asc&page=0&size=5&sort=title,asc\"}"));
+		
+		assertTrue(content.contains("\"page\":{\"size\":5,\"totalElements\":15,\"totalPages\":3,\"number\":1}}"));
+		
+	}
+	
 	
 	private void mockBook() {
 		book.setAuthor("Robert C. Martin");
