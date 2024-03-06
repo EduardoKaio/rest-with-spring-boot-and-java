@@ -35,5 +35,3 @@ jobs:
     - name: Push to Docker Hub Container Registry
       run: |
         docker push ${{ secrets.DOCKER_USERNAME }}/rest-with-spring-boot-erudio:latest
-
-        
