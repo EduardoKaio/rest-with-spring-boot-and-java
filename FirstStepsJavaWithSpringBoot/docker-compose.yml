@@ -19,7 +19,7 @@ services:
     networks:
       - erudio-network
   rest-with-spring-boot-erudio:
-    image: leandrocgsi/rest-with-spring-boot-erudio
+    image: eduardokaio/rest-with-spring-boot-erudio
     restart: always
     build: ./rest-with-spring-boot-and-java-erudio
     working_dir: /rest-with-spring-boot-and-java-erudio
