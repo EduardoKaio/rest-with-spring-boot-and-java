@@ -1,7 +1,7 @@
 # Rest with Spring Boot and Java
 [![Docker Hub Repo](https://img.shields.io/docker/pulls/eduardokaio/rest-with-spring-boot-erudio.svg)](https://hub.docker.com/repository/docker/eduardokaio/rest-with-spring-boot-erudio)
 
-CRUD em padrão REST;  
+API em padrão RESTful;  
 Tratamento de Exceptions;  
 Integração ao Banco de Dados: MySQL;  
 Padrão de Projetos: Value Object;  
