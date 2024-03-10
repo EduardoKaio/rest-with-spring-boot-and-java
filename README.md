@@ -15,3 +15,4 @@ Paginação;
 Testes unitários e de integração automatizados: JUnit;   
 Rest Assured e TestContainers;  
 Dockerização;  
+Integração contínua: Github Actions;  
