@@ -17,4 +17,3 @@ Rest Assured e TestContainers;
 Dockerização;  
 Integração contínua: Github Actions;  
 
-testando
