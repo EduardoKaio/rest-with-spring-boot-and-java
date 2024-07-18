@@ -34,3 +34,42 @@ Este projeto é uma API RESTful desenvolvida com Spring Boot e Java, com várias
 ```sh
 git clone https://github.com/eduardokaio/rest-with-spring-boot-erudio.git
 cd rest-with-spring-boot-erudio
+```
+
+### Configurar o Banco de Dados
+1. Crie um banco de dados MySQL.
+2. Configure as credenciais do banco de dados no application.yml:
+
+```sh
+url: jdbc:mysql://localhost:3306/seu_banco_de_dados?useTimezone=true&serverTimezone=UTC
+username: seu_usuario
+password: sua_senha
+```
+
+### Executar o Projeto
+```sh
+./mvnw spring-boot:run
+```
+
+### Uso do Docker
+
+Para construir e executar o projeto em um contêiner Docker:
+```sh
+docker build -t rest-with-spring-boot-erudio .
+docker run -p 8080:8080 rest-with-spring-boot-erudio
+```
+
+### Documentação da API
+
+A documentação da API está disponível no Swagger:
+```bash
+http://localhost:8080/swagger-ui.html
+```
+
+### Testes
+
+Para executar os testes:
+```sh
+./mvnw test
+```
+
