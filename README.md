@@ -33,7 +33,7 @@ Este projeto é uma API RESTful desenvolvida com Spring Boot e Java, com várias
 
 ```sh
 git clone https://github.com/eduardokaio/rest-with-spring-boot-erudio.git
-cd rest-with-spring-boot-erudio
+cd rest-with-spring-boot-and-java
 ```
 
 ### Configurar o Banco de Dados
